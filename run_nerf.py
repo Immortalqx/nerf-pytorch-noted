@@ -612,7 +612,7 @@ def train():
             far = 1.
         print('NEAR FAR', near, far)
 
-    elif args.dataset_type == 'blender':
+    elif args.dataset_type == 'blender':  # 合成数据集
         images, poses, render_poses, hwf, i_split = load_blender_data(args.datadir, args.half_res, args.testskip)
         print('Loaded blender', images.shape, render_poses.shape, hwf, args.datadir)
         i_train, i_val, i_test = i_split
@@ -621,6 +621,7 @@ def train():
         far = 6.
 
         if args.white_bkgd:
+            # alpha*前景RGB+(1-alpha)*背景RGB
             images = images[..., :3] * images[..., -1:] + (1. - images[..., -1:])
         else:
             images = images[..., :3]
