@@ -484,7 +484,7 @@ def config_parser():
     parser.add_argument("--netwidth_fine", type=int, default=256,
                         help='channels per layer in fine network')
     parser.add_argument("--N_rand", type=int, default=32 * 32 * 4,
-                        help='batch size (number of random rays per gradient step)')
+                        help='batch size (number of random rays per gradient step)')  # batch_size
     parser.add_argument("--lrate", type=float, default=5e-4,
                         help='learning rate')
     parser.add_argument("--lrate_decay", type=int, default=250,
@@ -493,8 +493,8 @@ def config_parser():
                         help='number of rays processed in parallel, decrease if running out of memory')
     parser.add_argument("--netchunk", type=int, default=1024 * 64,
                         help='number of pts sent through network in parallel, decrease if running out of memory')
-    parser.add_argument("--no_batching", action='store_true',
-                        help='only take random rays from 1 image at a time')
+    parser.add_argument("--no_batching", action='store_true',  # 合成数据集一般是True, 每次从一张图片中选取随机光线;真实数据集一般是False, 图像混到一起
+                        help='only take random rays from 1 image at a time')  # 可能是防止取得两条对立的光线(对训练的效果不好)
     parser.add_argument("--no_reload", action='store_true',
                         help='do not reload weights from saved ckpt')
     parser.add_argument("--ft_path", type=str, default=None,
@@ -502,15 +502,15 @@ def config_parser():
 
     # rendering options
     parser.add_argument("--N_samples", type=int, default=64,
-                        help='number of coarse samples per ray')
+                        help='number of coarse samples per ray')  # 粗网络一条光线上采样的数量
     parser.add_argument("--N_importance", type=int, default=0,
-                        help='number of additional fine samples per ray')
+                        help='number of additional fine samples per ray')  # 精细网络上一条光线上采样点的数量
     parser.add_argument("--perturb", type=float, default=1.,
-                        help='set to 0. for no jitter, 1. for jitter')
+                        help='set to 0. for no jitter, 1. for jitter')  # 是否在采样点附近有一些随机扰动或变化
     parser.add_argument("--use_viewdirs", action='store_true',
-                        help='use full 5D input instead of 3D')
+                        help='use full 5D input instead of 3D')  # 论文里说不使用view directions, 精细的地方会模糊(消融实验)
     parser.add_argument("--i_embed", type=int, default=0,
-                        help='set 0 for default positional encoding, -1 for none')
+                        help='set 0 for default positional encoding, -1 for none')  # 是否使用位置编码(消融实验)
     parser.add_argument("--multires", type=int, default=10,
                         help='log2 of max freq for positional encoding (3D location)')
     parser.add_argument("--multires_views", type=int, default=4,
@@ -526,6 +526,7 @@ def config_parser():
                         help='downsampling factor to speed up rendering, set 4 or 8 for fast preview')
 
     # training options
+    # 中心裁剪, 在最开始precrop_iters轮先训练图像中心的部分(比如lego, 有用的信息集中在中心部分), 之后再在整张图片上进行训练
     parser.add_argument("--precrop_iters", type=int, default=0,
                         help='number of steps to train on central crops')
     parser.add_argument("--precrop_frac", type=float,
@@ -542,9 +543,9 @@ def config_parser():
                         help='options : armchair / cube / greek / vase')
 
     ## blender flags
-    parser.add_argument("--white_bkgd", action='store_true',
+    parser.add_argument("--white_bkgd", action='store_true',  # 白色背景
                         help='set to render synthetic data on a white bkgd (always use for dvoxels)')
-    parser.add_argument("--half_res", action='store_true',
+    parser.add_argument("--half_res", action='store_true',  # 使用一半分辨率
                         help='load blender synthetic data at 400x400 instead of 800x800')
 
     ## llff flags
